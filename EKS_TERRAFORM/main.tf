@@ -26,10 +26,10 @@ data "aws_vpc" "default" {
   default = true
 }
 #get public subnets for cluster
-data "aws_subnets" "public" {
+data "aws_subnets" "filtered" {
   filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.default.id]
+    name   = "availability-zone"
+    values = ["us-east-1a", "us-east-1b"]
   }
 }
 #cluster provision
@@ -38,7 +38,7 @@ resource "aws_eks_cluster" "example" {
   role_arn = aws_iam_role.example.arn
 
   vpc_config {
-    subnet_ids = data.aws_subnets.public.ids
+    subnet_ids = data.aws_subnets.filtered.ids
   }
 
   # Ensure that IAM Role permissions are created before and deleted after EKS Cluster handling.
