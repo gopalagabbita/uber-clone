@@ -25,7 +25,7 @@ resource "aws_iam_role_policy_attachment" "example-AmazonEKSClusterPolicy" {
 data "aws_vpc" "default" {
   default = true
 }
-#get public subnets for cluster
+#get filtered subnets for cluster
 data "aws_subnets" "filtered" {
   filter {
     name   = "availability-zone"
@@ -78,6 +78,12 @@ resource "aws_iam_role_policy_attachment" "example-AmazonEC2ContainerRegistryRea
   role       = aws_iam_role.example1.name
 }
 
+data "aws_subnets" "public" {
+  filter {
+    name = "vpc-id"
+    values = [ data.aws_vpc.default.id ]
+  }
+}
 #create node group
 resource "aws_eks_node_group" "example" {
   cluster_name    = aws_eks_cluster.example.name
